@@ -1,0 +1,24 @@
+{
+  "name": "rxcmd",
+  "description": "Execute unix shell process as RxJS Observable like RxCmd.exec('echo hello').subscribe(...)",
+  "main": "rxcmd.js",
+  "@PARTPIPE@VERKEY@PARTPIPE@": "@PARTPIPE@VERSION@PARTPIPE@",
+  "dependencies": {
+    "rxjs": "^5.4.0"
+  },
+  "devDependencies": {
+    "coffee-jshint": "^0.2.6",
+    "coffee-script": "^1.12.4",
+    "mocha": "^3.4.1",
+    "partpipe": "^0.4.0"
+  },
+  "tags": [],
+  "author": {
+    "name": "kssfilo"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kssfilo/rxcmd.git"
+  }
+}
