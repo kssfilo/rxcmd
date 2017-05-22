@@ -4,6 +4,7 @@ assert=require 'assert'
 
 Rx=require 'rxjs'
 RxCmd=require './rxcmd'
+Fs=require('fs')
 
 it 'single',(cb)-> RxCmd.exec('echo foo').flatMap(RxCmd.filter('sed s/foo/bar/g')).subscribe (v)->
 		cb assert.equal v,"bar\n"
@@ -14,6 +15,7 @@ it 'multi',(cb)->
 		'echo fuga'
 		'echo moga'
 	]
+
 	res=''
 	
 	Rx.Observable.from(commands)
@@ -27,3 +29,9 @@ it 'multi',(cb)->
 			cb()
 	)
 
+it 'sink',(cb)->
+	Rx.Observable.of('foo').subscribe RxCmd.sink 'tee test.out',(err,stdout,stderr)->
+		Fs.readFile 'test.out','utf8',(err,res)->
+			Fs.unlink 'test.out',->
+				assert.equal res,'foo'
+				cb()

@@ -1,7 +1,7 @@
 .SUFFIXES:
 
 APPNAME=rxcmd
-VERSION=0.1.1
+VERSION=0.2.0
 
 #=
 
@@ -40,7 +40,7 @@ $(DESTDIR):
 $(DESTDIR)/README.md:README.md $(TARGETS)
 	cp README.md $@
 
-$(DESTDIR)/package.json:package.json|$(DESTDIR)
+$(DESTDIR)/package.json:package.json $(SDK)|$(DESTDIR)
 	cat $<|$(TOOLS)/partpipe VERKEY@version VERSION@$(VERSION) >$@
 
 $(DESTDIR)/%.js:%.coffee $(SDK)|$(DESTDIR)

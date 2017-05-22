@@ -55,6 +55,19 @@ Rx.Observable.from(commands)
 ["fxx\n","bar\n","bxx\n"]
 ```
 
+### Sink
+
+```
+Rx.Observable.from('Hello World').subscribe(RxCmd.sink('tee hello.txt'));
+
+-> cat hello.txt -> "Hello World"
+
+Rx.Observable.from('Hello World').subscribe(RxCmd.sink('tee hello.txt'),function(err,stdout,stderr){
+	console.log(stdout);  #"Hello World"
+}));
+```
+
 ## Change Log
 
+- 0.2.x:added sink()
 - 0.1.x:first release
