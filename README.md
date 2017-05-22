@@ -37,7 +37,7 @@ RxCmd.exec('echo Hello World').flatMap(RxCmd.filter('sed s/World/RxCmd/'))
 Hello RxCmd
 ```
 
-### Multipule command (Parallel)
+### Multiple command (Parallel)
 
 ```
 var commands=[
