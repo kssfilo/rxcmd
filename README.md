@@ -1,7 +1,7 @@
 rxcmd
 ==========
 
-Execute unix shell process as RxJS Observable like RxCmd.exec('echo hello').subscribe(...)
+Execute unix shell command process as RxJS Observable like RxCmd.exec('echo hello').subscribe(...)
 
 ## Install
 
@@ -15,7 +15,7 @@ RxCmd=require('rxcmd');
 
 ## Usage
 
-### Run unix command
+### Run unix command (exec)
 
 ```
 RxCmd.exec('echo Hello World')
@@ -26,10 +26,10 @@ RxCmd.exec('echo Hello World')
 Hello World
 ```
 
-### Filtering 
+### Filtering (filter/liftFilter)
 
 ```
-RxCmd.exec('echo Hello World').flatMap(RxCmd.filter('sed s/World/RxCmd/'))
+RxCmd.exec('echo Hello World').lift(RxCmd.filter('sed s/World/RxCmd/'))
 .subscribe(function(output){console.log(output);});
 
 ->
@@ -37,7 +37,7 @@ RxCmd.exec('echo Hello World').flatMap(RxCmd.filter('sed s/World/RxCmd/'))
 Hello RxCmd
 ```
 
-### Multiple command (Parallel)
+### Parallel execution (mapExec/mapFilter)
 
 ```
 var commands=[
@@ -47,27 +47,46 @@ var commands=[
 ]
 
 Rx.Observable.from(commands)
-.flatMap(RxCmd.multiExec()).flatMap(RxCmd.filter('sed s/o/x/g')).toArray()
+.flatMap(RxCmd.mapExec()).flatMap(RxCmd.mapFilter('sed s/o/x/g'))
 .subscribe(function(output){console.log(output);});
 
 ->
 
-["fxx\n","bar\n","bxx\n"]
+fxx
+bar
+bxx
 ```
 
-### Sink
+### Sink (sink)
 
 ```
-Rx.Observable.from('Hello World').subscribe(RxCmd.sink('tee hello.txt'));
-
--> cat hello.txt -> "Hello World"
-
-Rx.Observable.from('Hello World').subscribe(RxCmd.sink('tee hello.txt'),function(err,stdout,stderr){
+Rx.Observable.from('Hello World').subscribe(RxCmd.sink(function(err,stdout){
 	console.log(stdout);  #"Hello World"
 }));
+
+Rx.Observable.from('Hello World').subscribe(RxCmd.sink());
+
+-> Hello World (Simply print if no argument)
+```
+
+### Connecting process.stdin
+
+```
+#test.js
+
+RxCmd.exec('cat',{stdin:true})
+.subscribe(function(output){console.log(output);});
+
+>echo Hello|node test.js
+
+-> Hello
 ```
 
 ## Change Log
 
+- 0.3.x:using spawn() instead of exec()
+- 0.3.x:breaking changes:filter()=liftFilter() specification
+- 0.3.x:breaking changes:sink() specification
+- 0.3.x:breaking changes:filter()->mapFilter()/multiExec()->mapExec()
 - 0.2.x:added sink()
 - 0.1.x:first release
