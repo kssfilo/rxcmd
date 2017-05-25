@@ -1,16 +1,17 @@
-rxcmd
+rxjs-exec
 ==========
 
-Execute unix shell command process as RxJS Observable like RxCmd.exec('echo hello').subscribe(...)
+Execute unix shell command process as RxJS Observable like Rx.Observable.exec('echo hello').subscribe(...)
 
 ## Install
 
 ```
-npm install rxcmd
+npm install rxjs-exec
 ```
 
 ```
-RxCmd=require('rxcmd');
+Rx=require('rxjs');
+require('rxjs-exec').patch(Rx.Observable);
 ```
 
 ## Usage
@@ -18,7 +19,7 @@ RxCmd=require('rxcmd');
 ### Run unix command (exec)
 
 ```
-RxCmd.exec('echo Hello World')
+Rx.Observable.exec('echo Hello World')
 .subscribe(function(output){console.log(output);});
 
 ->
@@ -26,18 +27,21 @@ RxCmd.exec('echo Hello World')
 Hello World
 ```
 
-### Filtering (filter/liftFilter)
+### Filtering (execFilter)
 
 ```
-RxCmd.exec('echo Hello World').lift(RxCmd.filter('sed s/World/RxCmd/'))
+Rx.Observable.exec('echo Hello World').execFilter('sed s/World/rxjs-exec/')
 .subscribe(function(output){console.log(output);});
 
 ->
 
-Hello RxCmd
+Hello rxjs-exec
+
+#same as 
+#>echo Hello World|sed s/World/rxjs-exec/ 
 ```
 
-### Parallel execution (mapExec/mapFilter)
+### Parallel execution (mapExec/mapExecFilter)
 
 ```
 var commands=[
@@ -47,7 +51,7 @@ var commands=[
 ]
 
 Rx.Observable.from(commands)
-.flatMap(RxCmd.mapExec()).flatMap(RxCmd.mapFilter('sed s/o/x/g'))
+.mapExec().mapExecFilter('sed s/o/x/g')
 .subscribe(function(output){console.log(output);});
 
 ->
@@ -55,18 +59,32 @@ Rx.Observable.from(commands)
 fxx
 bar
 bxx
+
+#same as 
+#>echo foo|sed s/o/x/g &
+#>echo bar|sed s/o/x/g &
+#>echo boo|sed s/o/x/g &
 ```
 
-### Sink (sink)
-
 ```
-Rx.Observable.from('Hello World').subscribe(RxCmd.sink(function(err,stdout){
-	console.log(stdout);  #"Hello World"
-}));
+var commands=[
+	'echo foo',
+	'echo bar',
+	'echo boo'
+]
 
-Rx.Observable.from('Hello World').subscribe(RxCmd.sink());
+Rx.Observable.from(commands)
+.mapExec().execFilter('sed s/o/x/g')
+.subscribe(function(output){console.log(output);});
 
--> Hello World (Simply print if no argument)
+->
+
+fxx
+bar
+bxx
+
+#same as 
+#>{ echo foo;echo bar;echo boo }|sed s/o/x/g 
 ```
 
 ### Connecting process.stdin
@@ -74,7 +92,7 @@ Rx.Observable.from('Hello World').subscribe(RxCmd.sink());
 ```
 #test.js
 
-RxCmd.exec('cat',{stdin:true})
+Rx.Observable.exec('cat',{stdin:true})
 .subscribe(function(output){console.log(output);});
 
 >echo Hello|node test.js
@@ -82,11 +100,26 @@ RxCmd.exec('cat',{stdin:true})
 -> Hello
 ```
 
+### Buffer(binary) output
+
+```
+Rx.Observable.exec('echo Hello',{binary:true})
+.execFilter('cat',{binary:true}).
+.subscribe(function(output){console.log(output);});
+
+-> <Buffer 48 65 6c 6c 6f 0a>
+```
+
+### ES7 style
+
+```
+import Rx from 'rxjs';
+import {exec,execFilter,mapExec,mapExecFilter} from 'rxjs-exec'
+
+Rx.Observable::exec('echo Hello World')::execFilter('sed s/World/rxjs-exec/').subscribe(v=>console.log(v));
+
+```
+
 ## Change Log
 
-- 0.3.x:using spawn() instead of exec()
-- 0.3.x:breaking changes:filter()=liftFilter() specification
-- 0.3.x:breaking changes:sink() specification
-- 0.3.x:breaking changes:filter()->mapFilter()/multiExec()->mapExec()
-- 0.2.x:added sink()
-- 0.1.x:first release
+- 0.4.0:forked from rxcmd.js

@@ -2,21 +2,19 @@
 
 assert=require 'assert'
 
-Rx=require 'rxjs'
-RxCmd=require './rxcmd'
-Fs=require('fs')
+Rx=require('rxjs')
+require('./rxjs-exec').patch(Rx.Observable)
 
-it 'exec/liftFilter',(cb)->
-
+it 'exec/execFilter',(cb)->
 	r=''
-	RxCmd.exec('echo foo').lift(RxCmd.liftFilter('sed s/foo/bar/g')).subscribe
+	Rx.Observable.exec('echo foo').execFilter('sed s/foo/bar/g').subscribe
 		next:(v)->r+=v
 		error:(err)->console.error "error:#{err}"
 		complete:->
 			assert.equal r,"bar\n"
 			cb()
 
-it 'mapExec/mapFilter',(cb)->
+it 'mapExec/mapExecFilter',(cb)->
 	commands=[
 		'echo hoge'
 		'echo fuga'
@@ -25,15 +23,10 @@ it 'mapExec/mapFilter',(cb)->
 
 	r=''
 	Rx.Observable.from(commands)
-	.flatMap(RxCmd.mapExec()).flatMap(RxCmd.mapFilter('sed s/o/x/g')).subscribe
+	.mapExec().mapExecFilter('sed s/o/x/g').subscribe
 		next:(v)->r+=v
 		error:(err)->console.error "error:#{err}"
 		complete:->
 			assert.equal r,"hxge\nfuga\nmxga\n"
 			cb()
-
-it 'sink',(cb)->
-	Rx.Observable.of('foo').subscribe RxCmd.sink (err,stdout)->
-		assert.equal stdout,'foo'
-		cb()
 

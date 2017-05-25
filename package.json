@@ -1,12 +1,13 @@
 {
-  "name": "rxcmd",
-  "description": "Execute unix shell process as RxJS Observable like RxCmd.exec('echo hello').subscribe(...)",
-  "main": "rxcmd.js",
+  "name": "rxjs-exec",
+  "description": "Execute unix shell process as RxJS Observable like Rx.Observable.exec('echo hello').subscribe(...)",
+  "main": "rxjs-exec.js",
   "@PARTPIPE@VERKEY@PARTPIPE@": "@PARTPIPE@VERSION@PARTPIPE@",
   "dependencies": {
     "rxjs": "^5.4.0"
   },
   "devDependencies": {
+    "babel-plugin-transform-function-bind": "^6.22.0",
     "coffee-jshint": "^0.2.6",
     "coffee-script": "^1.12.4",
     "mocha": "^3.4.1",
